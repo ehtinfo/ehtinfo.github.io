@@ -54,45 +54,56 @@
 	     var num_fte = document.getElementById("num_fte_input").value;
 	     var employee_wage = document.getElementById("employee_wage_input").value;
 
-	     var option1 = 0;
-	     if (revenue > 10000000){
-		 if (num_fte < 101){
-		     option1 = .0025*num_fte*40*50*employee_wage;
-		 } else if (num_fte < 501){
-		     option1 = .005*num_fte*40*50*employee_wage;
-		 } else {
-		     option1 = .0075*num_fte*40*50*employee_wage;
-		 }
-	     } else if (revenue >= 500000){
-		 option1 = 395;
+	     var first_two_years = 0.0;
+	     if (revenue > 20000000){
+		 first_two_years = Math.min(.26*num_fte*40*50, 500*num_fte)
 	     }
 
-	     var option2 = 0
-	     if (revenue > 8000000){
-		 if (num_fte < 501){
-		     option2 = 200*num_fte;
-		 } else {
-		     option2 = 450*num_fte;
-		 }
-	     } else if (revenue >= 500000){
-		 option2 = 395;
+	     var thereafter = 0.0;
+	     if (revenue > 20000000){
+		 thereafter = .007*num_fte*40*50*employee_wage
 	     }
+	     
 
-	     var option3 = 0
-	     if (revenue > 8000000){
-		 if (num_fte < 501){
-		     option3 = 140*num_fte + .001*num_fte*40*50*employee_wage;
-		 } else {
-		     option3 = 300*num_fte + .0025*num_fte*40*50*employee_wage;
-		 }
-	     } else if (revenue >= 500000){
-		 option3 = 395;
-	     }
+	     // commented out formulas for PRTF recommendations
+	     /* var option1 = 0;
+		if (revenue > 10000000){
+		if (num_fte < 101){
+		option1 = .0025*num_fte*40*50*employee_wage;
+		} else if (num_fte < 501){
+		option1 = .005*num_fte*40*50*employee_wage;
+		} else {
+		option1 = .0075*num_fte*40*50*employee_wage;
+		}
+		} else if (revenue >= 500000){
+		option1 = 395;
+		}
+
+		var option2 = 0
+		if (revenue > 8000000){
+		if (num_fte < 501){
+		option2 = 200*num_fte;
+		} else {
+		option2 = 450*num_fte;
+		}
+		} else if (revenue >= 500000){
+		option2 = 395;
+		}
+
+		var option3 = 0
+		if (revenue > 8000000){
+		if (num_fte < 501){
+		option3 = 140*num_fte + .001*num_fte*40*50*employee_wage;
+		} else {
+		option3 = 300*num_fte + .0025*num_fte*40*50*employee_wage;
+		}
+		} else if (revenue >= 500000){
+		option3 = 395;
+		} */
 
 	     data = [
-		 {option: "Option 1", value:option1},
-		 {option: "Option 2", value:option2},
-		 {option: "Option 3", value:option3}
+		 {option: "2019 - 2020", value: first_two_years},
+		 {option: "2021 and after", value: thereafter},
 	     ]
 
 	     data.forEach(function(d) {
@@ -101,7 +112,7 @@
 	     });
 	     
 	     x.domain(data.map(function(d) { return d.option; }));
-	     y.domain([0, d3.max(data, function(d) { return d.value; })]);
+	     y.domain([0, d3.max(data, function(d) { return d.value; })+1]);
 
 
 	     svg.append("text")
@@ -110,7 +121,7 @@
 		.attr("text-anchor", "middle")  
 		.style("font-size", "16px") 
 		.style("text-decoration", "underline")  
-		.text("Additional Taxes Under the Different Proposed Options");
+		.text("Additional Taxes Under the Legislation's Proposed Timeline");
 	     
 	     svg.append("g")
 		.attr("class", "x axis")
@@ -118,9 +129,10 @@
 		.call(xAxis)
 		.selectAll("text")
 		.style("text-anchor", "end")
-		.attr("dx", "-.8em")
-		.attr("dy", "-.55em")
-		.attr("transform", "rotate(-90)" );
+		.attr("dx", "3.0em")
+		.attr("dy", "1.0em");
+	     /* .attr("dy", "-.55em"); */
+	     /* .attr("transform", "rotate(-90)" ); */
 	     
 	     svg.append("g")
 		.attr("class", "y axis")
@@ -181,55 +193,69 @@
 	   
 	    <h1>Employee Hours Tax Calculator</h1>
 	 <p>
-		The Progressive Revenue Taskforce recommended some new progressive taxes in <a href="https://www.seattle.gov/Documents/Departments/Council/Issues/ProgressiveRevenueTaskforce/Report-of-the-Progressive-Revenue-Taskforce-03-09-2018.pdf">their report</a>.
+	     The Seattle City Council has <a href="http://seattle.legistar.com/LegislationDetail.aspx?ID=3484387&GUID=637EE7DF-343D-446E-B91E-B0DF2D3858B2">proposed legislation</a> to raise a tax on the city's biggest companies whose revenue in Seattle exceeds $20M. 
 	    </p>
 	    <p>
 
-		They gave <a href="#" data-toggle="modal" data-target="#optionsModal">three concrete options</a> for the City Council to consider.
+		The proposal kicks in in <a href="#" data-toggle="modal" data-target="#optionsModal">two phases</a>.
 	    </p>
 	    
 	    <h3>So. How would these proposals affect your business?</h3>
-	    Fill in the numbers for your business below to see how the taskforce recommendations would effect you.
+	    Fill in the numbers for your business below to see how this bill would effect you.
 	    While you're at it, see how this would affect some other well-known Seattle businesses, and <a href="letter.html">sign our petition</a>.
 
 
 	    <div class="modal fade" id="optionsModal" tabindex="-1" role="dialog" aria-labelledby="optionsModalLabel" aria-hidden="true">
 		<div class="modal-dialog modal-lg" role="document">
 		    <div class="modal-content">
-			<!-- <div class="modal-header">
-			     <h5 class="modal-title" id="optionsModalLabel">Three PRTF Options</h5>
-			     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-			     <span aria-hidden="true">&times;</span>
-			     </button>
-			     </div> -->
 			<div class="modal-body">
-			    <h3>PRTF Recommendations*</h3>
-			    <h4>Option 1</h4>
-			    $10 million per year gross revenue exemption threshold
+
+			    <h3>City Council Proposed Legislation*</h3>
+			    <h4>Phase 1: 2019 - 2020</h4>
+			    Businesses with revenue below $20M pay $0.
+			    Larger businesses choose to pay one of these:
 			    <ul>
-				<li>Firms with 1-100 FTE employees pay 0.25% of all payroll (avg. $0.078/hr)</li>
-				<li>Firms with 101-500 FTE employees pay 0.50% of all payroll (avg. $0.156/hr)</li>
-				<li>Firms with 501+ FTE employees pay 0.75% of all payroll (avg. $0.234/hr)</li>
-				<li>Firms with gross revenue between $500,000 and $10 million pay $395/year</li>
+				<li>$0.26 per hour times the hours worked by all employees in Setatle</li>
+				<li>$500 per FTE in Seattle plus $0.26 time hours worked by part-time employees in Seattle</li>
 			    </ul>
 
-			    <h4>Option 2</h4>
-			    $8 million per year gross revenue exemption threshold
+			    <h4>Phase 2: 2021 and thereafter</h4>
+			    Businesses with revenue below $20M pay $0.
+			    Larger businesses pay:
 			    <ul>
-				<li>Firms with 1-500 FTE employees pay $200/FTE/year ($0.104/hr)</li>
-				<li>Firms with 501+ FTE employees pay $450/FTE/year ($0.234/hr)</li>
-				<li>Firms with gross revenue between $500,000 and $8 million pay $395/year</li>
+				<li>0.7 percent times the total payroll for all work in Seattle</li>
 			    </ul>
 
-			    <h4>Option 3</h4>
-			    $8 million per year gross revenue exemption threshold
-			    <ul>
-				<li>Firms with 1-500 FTE employees pay $140/FTE/year + 0.1% of all payroll</li>
-				<li>Firms with 501+ FTE employees pay $300/FTE/year + 0.25% of all payroll</li>
-				<li>Firms with gross revenue between $500,000 and $8 million pay $395/year</li>
-			    </ul>
-			    * In the report (Appendix B1), all three options list the "skin in the game" tax as $200/year for medium-sized businesses ($500K - $8-10M revenue).
-			    However, the taskforce's official recommendation (page 6) was $395 for this variable, so that is what we show in this tool, and we believe that's what the taskforce intended.
+			    * For simplicity, our calculator assumes all employees are full time, giving a slight under-estimate.
+
+
+			    <!-- <h3>PRTF Recommendations*</h3>
+				 <h4>Option 1</h4>
+				 $10 million per year gross revenue exemption threshold
+				 <ul>
+				 <li>Firms with 1-100 FTE employees pay 0.25% of all payroll (avg. $0.078/hr)</li>
+				 <li>Firms with 101-500 FTE employees pay 0.50% of all payroll (avg. $0.156/hr)</li>
+				 <li>Firms with 501+ FTE employees pay 0.75% of all payroll (avg. $0.234/hr)</li>
+				 <li>Firms with gross revenue between $500,000 and $10 million pay $395/year</li>
+				 </ul>
+
+				 <h4>Option 2</h4>
+				 $8 million per year gross revenue exemption threshold
+				 <ul>
+				 <li>Firms with 1-500 FTE employees pay $200/FTE/year ($0.104/hr)</li>
+				 <li>Firms with 501+ FTE employees pay $450/FTE/year ($0.234/hr)</li>
+				 <li>Firms with gross revenue between $500,000 and $8 million pay $395/year</li>
+				 </ul>
+
+				 <h4>Option 3</h4>
+				 $8 million per year gross revenue exemption threshold
+				 <ul>
+				 <li>Firms with 1-500 FTE employees pay $140/FTE/year + 0.1% of all payroll</li>
+				 <li>Firms with 501+ FTE employees pay $300/FTE/year + 0.25% of all payroll</li>
+				 <li>Firms with gross revenue between $500,000 and $8 million pay $395/year</li>
+				 </ul>
+				 * In the report (Appendix B1), all three options list the "skin in the game" tax as $200/year for medium-sized businesses ($500K - $8-10M revenue).
+				 However, the taskforce's official recommendation (page 6) was $395 for this variable, so that is what we show in this tool, and we believe that's what the taskforce intended. -->
 			</div>
 			<div class="modal-footer">
 			    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -249,13 +275,13 @@
 		<div class="col-sm-8">
 		    <h3>How would this effect your businesses?</h3>
 		    <div class="form-group row">
-			<label class="col-4 col-form-label" for="revenue_input">Annual Revenue ($)</label>
+			<label class="col-4 col-form-label" for="revenue_input">Annual Revenue In Seattle($)</label>
 			<div class="col-8">
 			    <input id="revenue_input" class="form-control" type="number" value="10000000" min="0">
 			</div>
 		    </div>
 		    <div class="form-group row">
-			<label class="col-4 col-form-label" for="num_fte_input">Number of Full-Time Equivalent Employees</label>
+			<label class="col-4 col-form-label" for="num_fte_input">Number of Full-Time Equivalent Employees in Seattle</label>
 			<div class="col-8">
 			    <input id="num_fte_input" class="form-control" type="number" value="2" min="0">
 			</div>
